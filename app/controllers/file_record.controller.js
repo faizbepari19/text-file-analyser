@@ -48,8 +48,7 @@ module.exports = {
 
     } catch (err) {
       res.status(err.code || 500).send({
-        message:
-          err.message || "Something went wrong"
+        message: err.message || "Something went wrong"
       });
     }
   },
