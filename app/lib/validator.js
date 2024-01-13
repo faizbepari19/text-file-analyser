@@ -12,12 +12,14 @@ module.exports = {
 
                 if (!data.hasOwnProperty(keys[index])) {
                     throw {
-                        message: keys[index] + " is Mandatory"
+                        message: keys[index] + " is Mandatory",
+                        code: 400
                     };
                 } else if (Array.isArray(data[keys[index]])) {
                     if (data[keys[index]].length == 0) {
                         throw {
-                            message: keys[index] + " can not be empty"
+                            message: keys[index] + " can not be empty",
+                            code: 400
                         };
                     }
                 } else {
@@ -29,7 +31,8 @@ module.exports = {
                         new RegExp("^\\s+$").test(data[keys[index]])
                     ) {
                         throw {
-                            message: keys[index] + " can not be empty"
+                            message: keys[index] + " can not be empty",
+                            code: 400
                         };
                     }
 
@@ -38,7 +41,8 @@ module.exports = {
             }
         } else {
             throw {
-                message: "Input empty"
+                message: "Input empty",
+                code: 400
             };
         }
         return true

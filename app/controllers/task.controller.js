@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const db = require("../models");
 
-const { UPLOAD_DIR, OPERATION_TYPES } = require('../lib/constants')
+const { UPLOAD_DIR, OPERATION_TYPES, TASK_STATUS } = require('../lib/constants')
 const { analyse } = require('../lib/analyser')
 const { validation } = require('../lib/validator')
 
@@ -22,7 +22,14 @@ module.exports = {
             validation(req.body, ['file_id', 'operation_type']);
 
             const fileId = req.body.file_id;
-            const operationType = req.body.operation_type;
+            const operationType = +req.body.operation_type;
+
+            if (!OPERATION_TYPES[operationType]) {
+                throw {
+                    message: 'Invalid operation',
+                    code: 400
+                }
+            }
 
             if (operationType == OPERATION_TYPES['Topmost']) {
                 validation(req.body, ['top_k']);
@@ -32,37 +39,49 @@ module.exports = {
 
             const fileData = await FileRecord.getFile(fileId);
 
+            const taskObject = {
+                file_id: fileId,
+                type: operationType
+            }
+
+            const taskDetails = await Task.saveTask(taskObject);
+
             const filePath = UPLOAD_DIR + fileData.file_name;
 
             // console.log(fileData, filePath)
+            console.log("returning response before analysis")
+            res.status(201).send({
+                message: "Analysis initiated",
+                taskId: taskDetails.id
+            });
+
+            let fileContent = null;
 
             const readableStream = fs.createReadStream(filePath);
 
-            // Event handler for when the stream is finished or encounters an error
-            readableStream.on('end', () => {
-                console.log('File read successfully.');
-            });
-
             readableStream.on('error', (err) => {
-                console.error('Error reading file:', err);
-                throw err
+                // console.error('Error reading file:', err);
+                Task.updateTask({
+                    task_result: null,
+                    status: TASK_STATUS.ERROR
+                }, taskDetails.id)
             });
 
-            readableStream.on("data", async (data) => {
-                const chunk = data.toString();
-                const opResult = analyse(chunk, operationType, topK);
-                const taskObject = {
-                    file_id: fileId,
-                    type: operationType,
-                    task_result: opResult
-                }
-                const taskDetails = await Task.saveTask(taskObject);
-
-                res.status(201).send({
-                    message: "Analysis completed",
-                    taskId: taskDetails.id
-                })
+            readableStream.on("data", (chunk) => {
+                console.log('reading file')
+                fileContent += chunk;
             });
+
+            readableStream.on('end', () => {
+                console.log('File read complete')
+                const analysedData = analyse(fileContent, operationType, topK);
+                console.log(analysedData)
+                Task.updateTask({
+                    task_result: analysedData.result,
+                    status: analysedData.status
+                }, taskDetails.id)
+
+            })
 
         } catch (err) {
             res.status(err.code || 500).send({
@@ -84,11 +103,19 @@ module.exports = {
             const taskId = req.params.task_id;
             const taskDetails = await Task.getDetails(taskId);
 
+            if (!taskDetails) {
+                throw {
+                    message: 'Task not found',
+                    code: 404
+                }
+            }
+
             res.status(200).send({
                 message: "Task details",
                 taskId: taskId,
                 operationType: OPERATION_TYPES[taskDetails.type],
-                result: taskDetails.task_result
+                result: taskDetails.task_result,
+                status: taskDetails.status
             })
         } catch (err) {
             res.status(err.code || 500).send({

@@ -10,5 +10,11 @@ module.exports = {
         'Topmost': 3,
         'Total unique words': 2,
         'Total words': 1
+    },
+
+    TASK_STATUS: {
+        'PENDING': 0,
+        'COMPLETE': 1,
+        'ERROR': 2
     }
 }
