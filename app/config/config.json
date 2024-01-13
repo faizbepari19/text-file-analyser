@@ -1,0 +1,16 @@
+{
+  "dev": {
+    "host": "db4free.net",
+    "username": "sql6506249",
+    "password": "fcm1MqlMgF",
+    "database": "file_analyser",
+    "dialect": "mysql",
+    "logging": true,
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
+  }
+}
