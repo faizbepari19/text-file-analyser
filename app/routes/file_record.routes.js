@@ -9,5 +9,5 @@ module.exports = app => {
 
   router.post("/upload",  upload.single('file'), files.uploadFile);
 
-  app.use('/api/files', router);
+  app.use('/api/file', router);
 };

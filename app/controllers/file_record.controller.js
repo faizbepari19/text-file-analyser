@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path')
 
 const db = require("../models");
+const { UPLOAD_DIR } = require("../lib/constants");
+const { validation } = require('../lib/validator')
 
 const FileRecord = db.file_records;
 
@@ -14,13 +16,10 @@ module.exports = {
   uploadFile: async (req, res) => {
     try {
 
+      validation(req, ['file']);
+
       const file = req.file;
-
-      if (!file) {
-        throw new Error('No file uploaded.');
-      }
-
-      const filePath = path.join(__dirname, '../../uploads/' + file.originalname);
+      const filePath = UPLOAD_DIR + file.originalname;
 
       const writableStream = fs.createWriteStream(filePath);
 

@@ -23,7 +23,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.file_records = require("./file_record.model.js")(sequelize, Sequelize);
-db.taks = require("./task.model.js")(sequelize, Sequelize);
+db.tasks = require("./task.model.js")(sequelize, Sequelize);
 
 
 module.exports = db;

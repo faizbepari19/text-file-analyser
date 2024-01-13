@@ -17,5 +17,14 @@ module.exports = (sequelize, Sequelize) => {
     return FileRecord.create({file_name});
   }
 
+  FileRecord.getFile = (file_id) => {
+    return FileRecord.findOne({
+      where: {
+        id: file_id,
+      },
+      raw: true
+    })
+  }
+
   return FileRecord;
 };
