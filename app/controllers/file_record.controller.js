@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path')
 
 const db = require("../models");
 const { UPLOAD_DIR } = require("../lib/constants");
@@ -19,6 +18,12 @@ module.exports = {
       validation(req, ['file']);
 
       const file = req.file;
+      if (file.mimetype != 'text/plain') {
+        throw {
+          message: 'Invalid file type',
+          code: 400
+        }
+      }
       const filePath = UPLOAD_DIR + file.originalname;
 
       const writableStream = fs.createWriteStream(filePath);
