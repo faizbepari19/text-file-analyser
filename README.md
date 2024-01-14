@@ -1,6 +1,6 @@
 # Text File Analyser
 
-This project contains REST APIs with to analyse text files based on input params.
+This project contains REST APIs to analyse text files based on input params.
 
 ## Build
 
@@ -38,30 +38,37 @@ Make sure node is installed.
 ## API endpoints
 
 POST - /api/file/upload
+```
     Body
     'file'
-    Response 201
+    Response 
+    Status Code: 201
     {
         "message": "File uploaded successfully.",
         "fileId": 14
     }
-
+```
 
 POST - /api/task/start
+```
     Body
     {
         "file_id": 14,
         "operation_type": 3,
         "top_k": 3
     }
-    Response 201
+    Response 
+    Status Code: 201
     {
         "message": "Analysis initiated",
         "taskId": 5
     }
+```
 
 GET - /api/task/retrieve/:task_id
-    Response 200
+```
+    Response 
+    Status Code: 200
     {
         "message": "Task details",
         "taskId": "5",
@@ -69,7 +76,7 @@ GET - /api/task/retrieve/:task_id
         "result": "850149",
         "status": 1
     }
-
+```
 
  ### Note: 
 I have added the DB configuration in the config.json file and committed it. I did it for the sake of simplicity for the evaluator to build the project and run it. [In ideal cases, we should not commit db configuration to the repo].
