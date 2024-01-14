@@ -1,11 +1,14 @@
 
 
 const express = require("express");
+const express_monitor = require('express-status-monitor');
 
 const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
+
+app.use(express_monitor())
 
 // parse requests of content-type - application/json
 app.use(express.json());

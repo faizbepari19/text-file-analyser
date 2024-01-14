@@ -1,3 +1,5 @@
+const { TASK_STATUS } = require('../lib/constants')
+
 module.exports = (sequelize, Sequelize) => {
     const Task = sequelize.define("task", {
         id: {
@@ -18,7 +20,7 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false
         },
         task_result: {
-            type: Sequelize.STRING(32),
+            type: Sequelize.STRING(255),
             allowNull: true,
         },
         status: {
@@ -43,6 +45,11 @@ module.exports = (sequelize, Sequelize) => {
         })
     }
 
+    /**
+     * 
+     * @param {*} task_data
+     * @returns saved task or existing task details
+     */
     Task.saveTask = async (task_data) => {
         const exists = await Task.findOne({
             where: {
@@ -53,11 +60,25 @@ module.exports = (sequelize, Sequelize) => {
         })
 
         if (exists) {
+            await Task.update({
+                task_result: null,
+                status: TASK_STATUS.PENDING
+            }, {
+                where: {
+                    id: exists.id,
+                },
+            });
             return exists
         }
         return Task.create(task_data);
     }
 
+    /**
+     * 
+     * @param {*} update object with update fields
+     * @param {*} task_id
+     * @returns updates task details
+     */
     Task.updateTask = (update, task_id) => {
         return Task.update({
             task_result: update.task_result,

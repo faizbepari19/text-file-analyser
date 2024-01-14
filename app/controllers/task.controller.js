@@ -3,8 +3,8 @@ const fs = require('fs');
 const db = require("../models");
 
 const { UPLOAD_DIR, OPERATION_TYPES, TASK_STATUS } = require('../lib/constants')
-const { analyse } = require('../lib/analyser')
-const { validation } = require('../lib/validator')
+const { validation } = require('../lib/validator');
+const analyser = require('../lib/analyser');
 
 const Task = db.tasks;
 const FileRecord = db.file_records;
@@ -55,7 +55,7 @@ module.exports = {
                 taskId: taskDetails.id
             });
 
-            let fileContent = null;
+            const heavyCompute = analyser.analyseV2(operationType)
 
             const readableStream = fs.createReadStream(filePath);
 
@@ -68,13 +68,13 @@ module.exports = {
             });
 
             readableStream.on("data", (chunk) => {
-                console.log('reading file')
-                fileContent += chunk;
+                heavyCompute(chunk.toString())
             });
 
             readableStream.on('end', () => {
                 console.log('File read complete')
-                const analysedData = analyse(fileContent, operationType, topK);
+                const processDone = heavyCompute('');
+                const analysedData = analyser.processFinalResults(processDone, operationType, topK);
                 console.log(analysedData)
                 Task.updateTask({
                     task_result: analysedData.result,

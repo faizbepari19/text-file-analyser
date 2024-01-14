@@ -34,8 +34,47 @@ npm start
 
 Make sure node is installed.
 
+
+## API endpoints
+
+POST - /api/file/upload
+    Body
+    'file'
+    Response 201
+    {
+        "message": "File uploaded successfully.",
+        "fileId": 14
+    }
+
+
+POST - /api/task/start
+    Body
+    {
+        "file_id": 14,
+        "operation_type": 3,
+        "top_k": 3
+    }
+    Response 201
+    {
+        "message": "Analysis initiated",
+        "taskId": 5
+    }
+
+GET - /api/task/retrieve/:task_id
+    Response 200
+    {
+        "message": "Task details",
+        "taskId": "5",
+        "operationType": "Total unique words",
+        "result": "850149",
+        "status": 1
+    }
+
+
  ### Note: 
 I have added the DB configuration in the config.json file and committed it. I did it for the sake of simplicity for the evaluator to build the project and run it. [In ideal cases, we should not commit db configuration to the repo].
 
+System can be used to deal with 1 GB files.
 
-Limitations: Encountered string length range issue when dealing with files with size 1 GB
+`status` in retrieve task API means `0 - pending`, `1 - completed`, `2 - error`
+`operation_type` in start analysis API means `1 - countWords`, `2 - countUniqueWords`, `3 - findTopKWords`

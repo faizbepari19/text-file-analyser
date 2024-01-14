@@ -1,7 +1,50 @@
 const { TASK_STATUS } = require('../lib/constants')
 
 module.exports = {
-    analyse: (data, operation, k) => {
+    analyseV2: (operation) => {
+        const wordFrequency = {};
+        const uniqueWordsSet = new Set();
+        let totalWords = 0;
+
+        switch (operation) {
+            case 1: {
+                return function (data) {
+                    const words = data.split(/\s+/);
+                    const nonEmptyWords = words.filter(word => word !== '');
+                    totalWords += nonEmptyWords.length;
+                    return totalWords
+                }
+
+            }
+
+            case 2: {
+                return function (data) {
+                    const words = data.toLowerCase().replace(/[.,]/g, '').split(/\s+/);
+                    const nonEmptyWords = words.filter(word => word !== '');
+                    nonEmptyWords.forEach((word) => {
+                        uniqueWordsSet.add(word);
+                    });
+                    return uniqueWordsSet
+                }
+
+            }
+
+            case 3: {
+                return function (data) {
+                    const words = data.toLowerCase().replace(/[.,]/g, '').split(/\s+/);
+                    // Count the frequency of each word
+                    words.forEach((word) => {
+                        wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+                    });
+
+                    return wordFrequency
+                }
+            }
+        }
+
+    },
+
+    processFinalResults: (processedData, operation, topK) => {
         let analysedData = {
             result: null,
             status: TASK_STATUS.PENDING
@@ -9,19 +52,19 @@ module.exports = {
         try {
             switch (operation) {
                 case 1: {
-                    analysedData.result = countWords(data);
+                    analysedData.result = processedData;
                     analysedData.status = TASK_STATUS.COMPLETE;
                     return analysedData;
                 }
 
                 case 2: {
-                    analysedData.result = countUniqueWords(data);
+                    analysedData.result = processedData.size;
                     analysedData.status = TASK_STATUS.COMPLETE;
                     return analysedData;
                 }
 
                 case 3: {
-                    analysedData.result = findTopKWords(data, k);
+                    analysedData.result = findTopKWords(processedData, topK);
                     analysedData.status = TASK_STATUS.COMPLETE;
                     return analysedData;
                 }
@@ -39,33 +82,7 @@ module.exports = {
     }
 }
 
-
-const countWords = (data) => {
-    const words = data.split(/\s+/);
-    const nonEmptyWords = words.filter(word => word !== '');
-    return nonEmptyWords.length;
-}
-
-const countUniqueWords = (data) => {
-    const words = data.split(/\s+/);
-    const uniqueWords = new Set();
-    words.forEach((word) => {
-        const lowerCase = word.toLowerCase();
-        uniqueWords.add(lowerCase);
-    });
-
-    return uniqueWords.size;
-}
-
-const findTopKWords = (data, k) => {
-    const words = data.split(/\s+/);
-    const wordFreq = words.reduce((acc, word) => {
-        const lowerCase = word.toLowerCase();
-        acc[lowerCase] = (acc[lowerCase] || 0) + 1;
-        return acc;
-    }, {});
-
-
+const findTopKWords = (wordFreq, k) => {
     const wordFreqArray = Object.entries(wordFreq).map(entry => {
         const [word, frequency] = entry;
         return { word, frequency };
