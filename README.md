@@ -81,7 +81,7 @@ GET - /api/task/retrieve/:task_id
  ### Note: 
 I have added the DB configuration in the config.json file and committed it. I did it for the sake of simplicity for the evaluator to build the project and run it. [In ideal cases, we should not commit db configuration to the repo].
 
-System can be used to deal with 1 GB files.
+The system is capable of handling files that are 1 GB in size
 
 `status` in retrieve task API means `0 - pending`, `1 - completed`, `2 - error`
 `operation_type` in start analysis API means `1 - countWords`, `2 - countUniqueWords`, `3 - findTopKWords`
